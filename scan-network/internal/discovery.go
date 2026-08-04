@@ -5,6 +5,7 @@ import (
   "time"
   "errors"
   "sync"
+  "camera-scanner/scan-network/internal"
 )
 
 const (
@@ -52,11 +53,13 @@ const (
 `
 )
 
-func listenConn(conn *net.UDPConn, wg *sync.WaitGroup){
+//LISTENING FOR THE REPLY
+func listenConn(conn *net.UDPConn, wg *sync.WaitGroup, c chan string){
   data_received := make([]byte,8192)
 
   
   defer wg.Done()
+  defer close(c)
   defer fmt.Println("[INFO] Listener Closed.")
   
   for {
@@ -69,11 +72,13 @@ func listenConn(conn *net.UDPConn, wg *sync.WaitGroup){
         fmt.Println("[ERROR] ",err)
       }
     } else {
-      fmt.Printf("\n[%s] %s\n",addr,data_received[:n])
+      fmt.Println(addr)
+      c <- fmt.SPrintf("%s",data_received[:n])
     }
   }
 }
 
+// SENDING PROBE MESSAGE AND DISCOVERING CAMERAS
 func DiscoverCamera(){
 
   // Resolving address to listen on 
@@ -112,11 +117,14 @@ func DiscoverCamera(){
     } else {
       fmt.Printf("[INFO] Discovery message sent successfully to %s\n",maddr)
     }
+
+    //making channel to send reply from listener to handler
+    c := make(chan string)
     
     //Creating listener goroutine
     wg := &sync.WaitGroup{}
     wg.Add(1)
-    go listenConn(conn,wg)
+    go listenConn(conn,wg,c)
     
     //Waiting 5 secs for the reply on our socket
     time.Sleep(10 * time.Second)
