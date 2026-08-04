@@ -1,6 +1,6 @@
 package main
 import (
-  "camera-scanner/scan-network/internal"
+  "camera-scanner/scan-network/internal/discovery"
 )
 
 func main(){
