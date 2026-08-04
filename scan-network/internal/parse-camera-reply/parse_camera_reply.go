@@ -3,6 +3,7 @@ import (
   "fmt"
   "encoding/xml"
   "strings"
+  "sync"
 )
 
 const (
@@ -37,7 +38,16 @@ func parseCameraReply(cameraReply string){
     camInfo.resolveScopes()
     fmt.Printf("Type: %s\n",camInfo.Type)
     fmt.Printf("XAddrs: %s\n",camInfo.XAddrs)
-    fmt.Printf("ScopesArr: %s\n",camInfo.ScopesArr)
+    fmt.Printf("ScopesArr: %s\n\n",camInfo.ScopesArr)
   }
 }
 
+//HANDLER TO PARSE CHANNEL DATA
+func Handler(wg *sync.WaitGroup,c chan string){
+  fmt.Printf("[INFO] Handler Started\n")
+  defer wg.Done()
+  defer fmt.Printf("[INFO] Closed Handler\n")
+  for i := range c{
+    parseCameraReply(i)
+  }
+}
