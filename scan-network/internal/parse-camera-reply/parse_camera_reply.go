@@ -2,8 +2,9 @@ package parsereply
 import (
   "fmt"
   "encoding/xml"
-  "strings"
   "sync"
+  "camera-scanner/scan-network/internal/get-rtsp-url"
+  "camera-scanner/scan-network/internal/camera"
 )
 
 const (
@@ -12,35 +13,28 @@ const (
 `
 )
 
-type CameraInfo struct{
-  Type string `xml:"Body>ProbeMatches>ProbeMatch>Types"`
-  Scopes string `xml:"Body>ProbeMatches>ProbeMatch>Scopes"`
-  XAddrs string `xml:"Body>ProbeMatches>ProbeMatch>XAddrs"`
-  ScopesArr []string
-}
-
-//To separate scope strings into an array
-func (c *CameraInfo) resolveScopes(){
-  c.ScopesArr = strings.Split(c.Scopes," ")
-}
 
 //TO CONVERT XML TO PROPER FORMAT
-func parseCameraReply(cameraReply string){
-  var camInfo CameraInfo
+func parseCameraReply(cameraReply string)(camera.CameraInfo, error){
+  var camInfo camera.CameraInfo
   xml_byte := []byte(cameraReply)
 
   err := xml.Unmarshal(xml_byte, &camInfo)  
 
   if err!=nil{
     fmt.Println("[Error] ",err)
+    return camera.CameraInfo{},err
   } else {
     //Resolving Scopes to array
-    camInfo.resolveScopes()
+    camInfo.ResolveScopes()
     fmt.Printf("Type: %s\n",camInfo.Type)
     fmt.Printf("XAddrs: %s\n",camInfo.XAddrs)
+    fmt.Printf("Scopes: %s\n",camInfo.Scopes)
     fmt.Printf("ScopesArr: %s\n\n",camInfo.ScopesArr)
+    return camInfo,nil
   }
 }
+
 
 //HANDLER TO PARSE CHANNEL DATA
 func Handler(wg *sync.WaitGroup,c chan string){
@@ -48,6 +42,16 @@ func Handler(wg *sync.WaitGroup,c chan string){
   defer wg.Done()
   defer fmt.Printf("[INFO] Closed Handler\n")
   for i := range c{
-    parseCameraReply(i)
+    camInfo,err := parseCameraReply(i)
+    if err!=nil{
+      fmt.Printf("[ERROR] %s",err)
+    }else{
+      _ ,err := getrtspurl.GetCapabilities(camInfo)
+      if err==nil{
+        fmt.Println("[INFO] Successfully retrieved capabilities.")
+      }else{
+        fmt.Println("[ERROR GETRTSP] ",err)
+      } 
+    } 
   }
 }
