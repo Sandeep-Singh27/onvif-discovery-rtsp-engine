@@ -5,7 +5,7 @@ import (
   "time"
   "errors"
   "sync"
-  "camera-scanner/scan-network/internal/parse-camera-reply"
+  "camera-scanner/scan-network/internal/parse-reply"
 )
 
 const (
