@@ -9,7 +9,7 @@ import (
 func Handler(wg *sync.WaitGroup,c chan string){
   fmt.Printf("[INFO] Handler Started\n")
   defer wg.Done()
-  defer fmt.Printf("[INFO] Closed Handler\n")
+  defer fmt.Printf("[INFO] Handler Closed\n")
   for i := range c{
     camInfo,err := parseProbeReply(i)
     if err!=nil{

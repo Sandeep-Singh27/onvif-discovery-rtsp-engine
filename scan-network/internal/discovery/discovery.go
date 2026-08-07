@@ -61,7 +61,7 @@ func listenConn(conn *net.UDPConn, wg *sync.WaitGroup, c chan string){
 
   defer wg.Done()
   defer close(c)
-  defer fmt.Println("[INFO] Listener Closed.")
+  defer fmt.Println("[INFO] Listener Closed")
   
   for {
     n,addr,err := conn.ReadFrom(data_received)
