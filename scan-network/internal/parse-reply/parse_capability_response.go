@@ -1,10 +1,11 @@
-package main//parsereply
+package parsereply
 import (
 	"fmt"
 	"encoding/xml"
-        "camera-scanner/scan-network/internal/camera"
+    "camera-scanner/scan-network/internal/camera"
 )
 
+/*
 const (	
 	sampleCapabilityResponse string = `[http://192.168.1.12:80/onvif/device_service] <?xml version="1.0" encoding="UTF-8"?>
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://www.w3.org/2003/05/soap-envelope" xmlns:SOAP-ENC="http://www.w3.org/2003/05/soap-encoding" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:wsa5="http://www.w3.org/2005/08/addressing" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:xmime="http://tempuri.org/xmime.xsd" xmlns:xmime5="http://www.w3.org/2005/05/xmlmime" xmlns:xmime4="http://www.w3.org/2004/11/xmlmime" xmlns:xop="http://www.w3.org/2004/08/xop/include" xmlns:tt="http://www.onvif.org/ver10/schema" xmlns:tds="http://www.onvif.org/ver10/device/wsdl" xmlns:tmd="http://www.onvif.org/ver10/deviceIO/wsdl" xmlns:trt="http://www.onvif.org/ver10/media/wsdl" xmlns:tr2="http://www.onvif.org/ver20/media/wsdl" xmlns:trp="http://www.onvif.org/ver10/replay/wsdl" xmlns:tse="http://www.onvif.org/ver10/search/wsdl" xmlns:tptz="http://www.onvif.org/ver20/ptz/wsdl" xmlns:tptz1="http://www.onvif.org/ver10/ptz/wsdl" xmlns:timg="http://www.onvif.org/ver20/imaging/wsdl" xmlns:timg1="http://www.onvif.org/ver10/imaging/wsdl" xmlns:tev="http://www.onvif.org/ver10/events/wsdl" xmlns:tan="http://www.onvif.org/ver20/analytics/wsdl" xmlns:wsnt="http://docs.oasis-open.org/wsn/b-2" xmlns:extXsd="http://www.onvifext.org/ver10/extFunctions/wsdl" xmlns:tns1="http://www.onvif.org/ver10/topics" xmlns:ter="http://www.onvif.org/ver10/error" xmlns:tanae="http://www.onvif.org/ver20/analytics/wsdl/AnalyticsEngineBinding" xmlns:tanre="http://www.onvif.org/ver20/analytics/wsdl/RuleEngineBinding">
@@ -134,20 +135,17 @@ const (
         </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>
 `
-)
+)*/
 
-var capabilityResponse = []byte(sampleCapabilityResponse)
+// var capabilityResponse = []byte(sampleCapabilityResponse)
 
-func parseCapabilityResponse(capabilityResponse []byte){
+func parseCapabilityResponse(capabilityResponse []byte)(camera.CameraMedia, error){
         var camMedia camera.CameraMedia
         if err := xml.Unmarshal(capabilityResponse,&camMedia); err!=nil{
-                fmt.Printf("[ERROR PARSECAPRESPONSE] %s\n",err)
+          return camera.CameraMedia{}, err
         } else {
                 fmt.Println(camMedia)
+                return camMedia,nil
         }
 }
 
-
-func main(){
-        parseCapabilityResponse(capabilityResponse)
-}
