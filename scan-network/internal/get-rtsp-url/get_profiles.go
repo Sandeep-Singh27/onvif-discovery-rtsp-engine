@@ -1,6 +1,5 @@
-package main//getrtspurl
+package getrtspurl
 import (
-  "fmt"
   "net/http"
   "strings"
   "io"
@@ -26,11 +25,4 @@ func GetProfiles(mediaXAddr string)([]byte,error){
   defer res.Body.Close()
   data_received,_ := io.ReadAll(res.Body)
   return data_received,nil
-}
-
-func main(){
-  mediaXAddr := "http://192.168.1.12:80/onvif/Media"
-  reply,_ := GetProfiles(mediaXAddr)
-  reply_string := string(reply)
-  fmt.Println(reply_string)
 }
