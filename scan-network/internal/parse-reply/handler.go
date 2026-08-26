@@ -3,6 +3,7 @@ import (
   "sync"
   "fmt"
   "camera-scanner/scan-network/internal/get-rtsp-url"
+  "errors"
 )
 
 //HANDLE FUNCTION TO BE CALLED BY HANDLER FOR EVERY REPLY
@@ -10,7 +11,7 @@ func handle(cameraReply string)error{
 
     camInfo,err := parseProbeReply(cameraReply)
     if err!=nil {
-      fmt.Printf("[ERROR] %s",err)
+      fmt.Printf("[ERROR PROBEREPLY] %s",err)
       return err
     }
 
@@ -23,10 +24,30 @@ func handle(cameraReply string)error{
     mediaXAddrs,err := parseCapabilityResponse(capabilities)
     if err!=nil {
       fmt.Println("[ERROR PARSECAPRES] ",err)
+      return err
     } 
+    fmt.Println("[*] MediaXAddrs: ",mediaXAddrs)
+
+    if len(mediaXAddrs.Media) < 1{
+      fmt.Println("[ERROR] No MediaXAddr found after GetCapabilities")
+      return errors.New("Found no MediaXAddr after GetCapabilities")
+    }
+  
+    profiles ,err := getrtspurl.GetProfiles(mediaXAddrs.Media[0].XAddrs)
+    if err!=nil{
+      fmt.Println("[ERROR GETPROFILES] ",err)
+      return err
+    }
     
-    //Checking if mediaXAddrs got any media service XAddr
-    fmt.Println("Media Length: ",len(mediaXAddrs.Media))
+    camProfiles,err := parseProfilesResponse(profiles)
+    if err!=nil {
+      fmt.Println("[ERROR PARSEPROFRES] ",err)
+      return err
+    }
+    fmt.Println("[*] Profile Tokens: ",camProfiles)
+    data,err := getrtspurl.RequestStreamURI(camProfiles.Profile[0].Token,camInfo)
+    fmt.Println(string(data))
+
     return nil
 }
 
