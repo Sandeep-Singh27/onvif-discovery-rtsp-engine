@@ -45,9 +45,22 @@ func handle(cameraReply string)error{
       return err
     }
     fmt.Println("[*] Profile Tokens: ",camProfiles)
-    data,err := getrtspurl.RequestStreamURI(camProfiles.Profile[0].Token,camInfo)
-    fmt.Println(string(data))
 
+    for _,v := range camProfiles.Profile{
+
+      data,err := getrtspurl.RequestStreamURI(v.Token,camInfo)
+      if err!=nil{
+        return fmt.Errorf("Error while getting streamuri %s : %w", v.Token,err)
+      }
+
+      camUri, err := parseStreamUriResponse(data)
+      if err!=nil{
+        return fmt.Errorf("Error while parsing streamuri %s : %w", v.Token,err)
+      }
+      
+      fmt.Println("[*]",v.Token," RTSP: ",camUri.Uri)
+
+    }
     return nil
 }
 
@@ -57,7 +70,10 @@ func Handler(wg *sync.WaitGroup,c chan string){
   defer wg.Done()
   defer fmt.Printf("[INFO] Handler Closed\n")
   for cameraReply := range c{
-    handle(cameraReply)
+    err := handle(cameraReply)
+    if err!=nil{
+      fmt.Println("[ERROR HANDLING REPLY] ",err)
+    }
   }
 }
 

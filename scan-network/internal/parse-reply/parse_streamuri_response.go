@@ -1,4 +1,4 @@
-package main
+package parsereply
 import (
 	"encoding/xml"
 	"camera-scanner/scan-network/internal/camera"
