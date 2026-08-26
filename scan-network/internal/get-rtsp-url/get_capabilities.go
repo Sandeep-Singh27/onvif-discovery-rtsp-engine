@@ -1,6 +1,5 @@
 package getrtspurl
 import (
-  "fmt"
   "net/http"
   "strings"
   "io"
@@ -32,7 +31,6 @@ func GetCapabilities(camInfo camera.CameraInfo)([]byte,error){
     if err==nil{
       defer res.Body.Close()
       data_received,_ := io.ReadAll(res.Body)
-      fmt.Printf("[%s] %s\n",camInfo.XAddrs,data_received)
       return data_received,nil
     }else{
       return nil,err
