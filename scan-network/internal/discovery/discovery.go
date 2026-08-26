@@ -67,7 +67,7 @@ func listenConn(conn *net.UDPConn, wg *sync.WaitGroup, c chan string){
     n,addr,err := conn.ReadFrom(data_received)
     if err!=nil{
       if errors.Is(err,net.ErrClosed){
-        fmt.Println("[INFO] Connection has been closed")
+        fmt.Println("\n[INFO] Connection has been closed")
         break
       } else {
         fmt.Println("[ERROR] ",err)
