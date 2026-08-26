@@ -1,6 +1,5 @@
 package parsereply
 import (
-	"fmt"
 	"encoding/xml"
     "camera-scanner/scan-network/internal/camera"
 )
@@ -144,7 +143,6 @@ func parseCapabilityResponse(capabilityResponse []byte)(camera.CameraMedia, erro
         if err := xml.Unmarshal(capabilityResponse,&camMedia); err!=nil{
           return camera.CameraMedia{}, err
         } else {
-                fmt.Println(camMedia)
                 return camMedia,nil
         }
 }
