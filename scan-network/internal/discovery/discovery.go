@@ -54,7 +54,7 @@ const (
 )
 
 //LISTENING FOR THE REPLY
-func listenConn(conn *net.UDPConn, wg *sync.WaitGroup, c chan string){
+func listenConn(conn *net.UDPConn, wg *sync.WaitGroup, c chan [2]string){
   fmt.Printf("[INFO] Listener Started\n\n")
   
   data_received := make([]byte,8192)
@@ -73,8 +73,8 @@ func listenConn(conn *net.UDPConn, wg *sync.WaitGroup, c chan string){
         fmt.Println("[ERROR] ",err)
       }
     } else {
-      fmt.Println(addr)
-      c <- fmt.Sprintf("%s",data_received[:n])
+      data_arr := [2]string{fmt.Sprintf("%s",addr),fmt.Sprintf("%s",data_received[:n])}
+      c <- data_arr
     }
   }
 }
@@ -120,7 +120,7 @@ func DiscoverCamera(){
     }
 
     //making channel to send reply from listener to handler
-    c := make(chan string)
+    c := make(chan [2]string)
     
     //Creating listener goroutine
     wg := &sync.WaitGroup{}

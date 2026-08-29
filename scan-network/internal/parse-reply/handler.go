@@ -7,13 +7,16 @@ import (
 )
 
 //HANDLE FUNCTION TO BE CALLED BY HANDLER FOR EVERY REPLY
-func handle(cameraReply string)error{
+func handle(cameraReply [2]string)error{
 
-    camInfo,err := parseProbeReply(cameraReply)
+    camInfo,err := parseProbeReply(cameraReply[1])
     if err!=nil {
       fmt.Printf("[ERROR PROBEREPLY] %s",err)
       return err
     }
+
+    //Assigning IP Address to CameraInfo 
+    camInfo.IPAddr = cameraReply[0]
 
     capabilities ,err := getrtspurl.GetCapabilities(camInfo)
     if err!=nil {
@@ -26,7 +29,6 @@ func handle(cameraReply string)error{
       fmt.Println("[ERROR PARSECAPRES] ",err)
       return err
     } 
-    fmt.Println("[*] MediaXAddrs: ",mediaXAddrs)
 
     if len(mediaXAddrs.Media) < 1{
       fmt.Println("[ERROR] No MediaXAddr found after GetCapabilities")
@@ -44,7 +46,9 @@ func handle(cameraReply string)error{
       fmt.Println("[ERROR PARSEPROFRES] ",err)
       return err
     }
-    fmt.Println("[*] Profile Tokens: ",camProfiles)
+
+    //Initializing map for CameraInfo.RTSPURLs
+    rtsp_urls := make(map[string]string)
 
     for _,v := range camProfiles.Profile{
 
@@ -57,15 +61,16 @@ func handle(cameraReply string)error{
       if err!=nil{
         return fmt.Errorf("Error while parsing streamuri %s : %w", v.Token,err)
       }
-      
-      fmt.Println("[*]",v.Token," RTSP: ",camUri.Uri)
-
+      rtsp_urls[v.Token] = camUri.Uri
     }
+
+    camInfo.RTSPUrls = rtsp_urls
+    fmt.Println(camInfo)
     return nil
 }
 
 //HANDLER TO PARSE CHANNEL DATA
-func Handler(wg *sync.WaitGroup,c chan string){
+func Handler(wg *sync.WaitGroup,c chan [2]string){
   fmt.Printf("[INFO] Handler Started\n")
   defer wg.Done()
   defer fmt.Printf("[INFO] Handler Closed\n")

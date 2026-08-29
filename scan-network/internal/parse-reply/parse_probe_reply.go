@@ -18,9 +18,6 @@ func parseProbeReply(cameraReply string)(camera.CameraInfo, error){
   } else {
     //Resolving Scopes to array
     camInfo.ResolveScopes()
-    fmt.Printf("[*] Type: %s\n",camInfo.Type)
-    fmt.Printf("[*] XAddrs: %s\n",camInfo.XAddrs)
-    fmt.Printf("[*] ScopesArr: %s\n",camInfo.ScopesArr)
     return camInfo,nil
   }
 }
